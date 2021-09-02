@@ -10,32 +10,16 @@ use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
-        return Product::all();
+        return Product::where('is_active', true)->get();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
 
@@ -48,60 +32,65 @@ class ProductController extends Controller
             'boxContents' => 'required',
             'color' => 'required',
             'variation' => 'required',
-            'sku' => 'nullable',
+            'sku' => 'required',
             'attributes' => 'nullable',
+            'images' => 'required',
             'image' => 'required',
+            'image.*' => 'mimes:jpeg,jpg,png,gif|max:2048'
         ]);
 
         if ($validator->fails()) {
             return response()->json($validator->errors(), 422);
         }
 
-        // $data->push("user_id" => auth()->user()->_id);
-
         $data['user_id'] = auth()->user()->_id;
         $data['is_active'] = true;
 
-        Product::create($data);
+
+        $product = new Product();
+        $product->productName = $data['productName'];
+        $product->description = $data['description'];
+        $product->category = $data['category'];
+        $product->color = $data['color'];
+        $product->boxContents = $data['boxContents'];
+        $product->variation = $data['variation'];
+        $product->attributes = $data['attributes'];
+        $product->sku = $data['sku'];
+        $product->images = $data['images'];
+        $product->user_id = $data['user_id'];
+        $product->is_active = $data['is_active'];
+        $product->save();
+
+        if ($request->hasFile('image')) {
+            foreach ($request->file('image') as $file) {
+                $file->storeAs('public/images', $file->getClientOriginalName());
+            }
+        }
 
         return response(['message' => 'Product Created!'], 201);
     }
 
     public function image(Request $request)
     {
-        $request->file('image')->storeAs('public/images', $request->file('image')->getClientOriginalName());
+        return $request;
+
+        foreach ($request->file('image') as $file) {
+            $file->storeAs('public/images', $file->getClientOriginalName());
+        }
+
         return response()->json(['messsage' => "Image Uploaded"], 200);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
     public function show(Product $product)
     {
         return $product;
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
     public function edit(Product $product)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, Product $product)
     {
         $data = $request->all();
@@ -138,12 +127,6 @@ class ProductController extends Controller
         return response(['message' => 'Product Updated!'], 201);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Product  $product
-     * @return \Illuminate\Http\Response
-     */
     public function destroy(Product $product)
     {
         //
@@ -151,7 +134,15 @@ class ProductController extends Controller
 
     public function userProduct()
     {
-        $user = User::where('_id', auth()->user()->_id)->first();
-        return $user->products;
+        $product = new Product();
+        return $product->userProducts();
+    }
+
+    public function changeStatus(Product $product)
+    {
+        $product->is_active = !$product->is_active;
+        $product->save();
+        $p = new Product();
+        return $p->userProducts();
     }
 }

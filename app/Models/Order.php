@@ -14,4 +14,8 @@ class Order extends Model
     protected $collection = 'orders';
 
     protected $guarded = [];
+    
+    public function suborders(){
+        return $this->hasMany(SubOrder::class);
+    }
 }

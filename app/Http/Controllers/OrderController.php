@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Address;
 use App\Models\Order;
 use App\Models\Product;
+use App\Models\SubOrder;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -16,7 +18,6 @@ class OrderController extends Controller
         $grandTotal = 0;
         $cart = $request->cart;
         $address = $request->address;
-
 
 
         //validating shipping address
@@ -55,18 +56,37 @@ class OrderController extends Controller
         //else return an error
         if ($grandTotal == $cart['total']) {
             $address = Address::create($address);
-            $cart['address_id'] = $address->_id;
-            $cart['user_id'] = auth()->user()->id;
-            Order::create($cart);
-            return response()->json('Order Added!', 200);
-            
-        }
 
-        return response()->json([$message = 'Error!'], 422);
+            $order = new Order();
+            $order->address_id = $address->_id;
+            $order->grandTotal = $grandTotal;
+            $order->user_id = auth()->user()->id;
+            $order->save();
+
+
+            foreach ($cart['products'] as $product) {
+                $product['order_id'] = $order->_id;
+                $product['status'] = "pending";
+                $product['created_at'] = Carbon::now();
+                $product['updated_at'] = Carbon::now();
+                SubOrder::create($product);
+            }
+
+            return response()->json(
+                [
+                    'products' => $cart['products'],
+                    'address' => $address,
+                    'grandTotal' => $grandTotal,
+                    'orderId' => $order->_id
+                ],
+                200
+            );
+        }
+        return response()->json('Error!', 422);
     }
 
-    public function show()
+    public function getOrder()
     {
-        
+        return SubOrder::where('user_id', auth()->user()->id)->get();
     }
 }

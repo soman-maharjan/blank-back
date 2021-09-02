@@ -14,4 +14,8 @@ class SubOrder extends Model
     protected $collection = 'suborders';
 
     protected $guarded = [];
+
+    public function orders(){
+        $this->belongsTo(Order::class);
+    }
 }

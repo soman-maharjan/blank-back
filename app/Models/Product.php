@@ -22,23 +22,16 @@ class Product extends Model
         return $this->belongsTo(User::class);
     }
 
-    // public function search(string $search)
-    // {
-    //     if (empty(trim($search))) {
-    //         return static::select($columns)->get();
-    //     }
-    //     else {
-    //         $fuzzySearch = implode("%", str_split($search)); 
-    //         $fuzzySearch = "%$fuzzySearch%";
-
-    //         return static::select($columns)->where("name", "like", $fuzzySearch)->get();
-    //     }
-    // }
-
     public function search(string $word)
     {
         $fuzzySearch = implode("%", str_split($word)); // e.g. test -> t%e%s%t
         $fuzzySearch = "%$fuzzySearch%";
         return Product::where('productName', 'like', $fuzzySearch)->get();
+    }
+
+    public function userProducts()
+    {
+        $user = User::where('_id', auth()->user()->_id)->first();
+        return $user->products;
     }
 }
