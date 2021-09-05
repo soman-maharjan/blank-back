@@ -12,7 +12,7 @@ class User extends Authenticatable
 {
     protected $connection = 'mongodb';
     protected $collection = 'users';
-    
+
     use HasFactory, Notifiable;
 
     /**
@@ -24,6 +24,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'number',
+        'description'
     ];
 
     /**
@@ -45,7 +47,8 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    public function products(){
+    public function products()
+    {
         return $this->hasMany(Product::class);
     }
 }
