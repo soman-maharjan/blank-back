@@ -20,7 +20,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::middleware(['auth:sanctum'])->group(function () {
     //Category Routes
-    Route::resource('category', App\Http\Controllers\CategoryController::class);
+    Route::resource('category', App\Http\Controllers\CategoryController::class, ['except' => ['index']]);
     Route::get('category/attribute/{category}', [App\Http\Controllers\CategoryController::class, 'attribute']);
 
 
@@ -31,15 +31,26 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('user-product', [App\Http\Controllers\ProductController::class, 'userProduct']);
 
 
-
+    //orders
     Route::post('/order', [App\Http\Controllers\OrderController::class, 'placeOrder']);
     Route::get('/get-order', [App\Http\Controllers\OrderController::class, 'getOrder']);
+
+    //ads
+    Route::post('ad', [App\Http\Controllers\AdController::class, 'store']);
+    Route::get('ad', [App\Http\Controllers\AdController::class, 'index']);
+    Route::post('ad/update-ad', [App\Http\Controllers\AdController::class, 'updateAd']);
+    Route::get('ad/active-ad', [App\Http\Controllers\AdController::class, 'activeAd']);
+
+    //users resource
+    Route::resource('/users', App\Http\Controllers\UserController::class);
 });
 
 
 // Product Management Routes
 Route::get('product', [App\Http\Controllers\ProductController::class, 'index']);
 Route::get('product/{product}', [App\Http\Controllers\ProductController::class, 'show']);
+
+Route::get('category', [App\Http\Controllers\CategoryController::class, 'index']);
 
 
 //Search

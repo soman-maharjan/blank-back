@@ -32,7 +32,7 @@ class OrderController extends Controller
             'state' => ['required'],
             'house_number' => ['nullable'],
             'country' => ['required', 'string'],
-            'phone_number' => ['integer', 'required', 'max:10'],
+            'phone_number' => ['integer', 'required'],
         ]);
 
         //return errors if the validation fails

@@ -2,84 +2,64 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Ad;
+use App\Models\Image;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class AdController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        //
+        if ($request->hasFile('images')) {
+            foreach ($request->images as $image) {
+                $filenameWithExt = $image->getClientOriginalName();
+
+                $filename = pathinfo($filenameWithExt, PATHINFO_FILENAME);
+
+                $extension = $image->getClientOriginalExtension();
+
+                $filenameToStore = $filename . '_' . time() . '.' . $extension;
+
+                $path = $image->storeAs('public/images', $filenameToStore);
+
+                $img = new Image();
+                $img->filename = $filenameToStore;
+                $img->filenameWithExt = $filenameWithExt;
+                $img->userFilename = $filename;
+                $img->extension = $extension;
+                $img->position = null;
+                $img->active = false;
+                $img->save();
+            }
+
+            return response("Image Uploaded!", 200);
+        }
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Ad  $ad
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Ad $ad)
+    public function index()
     {
-        //
+        return Image::all();
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Ad  $ad
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Ad $ad)
+    public function updateAd(Request $request)
     {
-        //
+        if ($request->option == 'delete') {
+            Image::destroy($request->id);
+        } else {
+            $product = Image::all()->where('active', '=', true)->where('position', '=', $request->option)->first();
+
+            if (($product != "") && ($request->option != 'carousel')) {
+                $product->active = false;
+                $product->save();
+            }
+
+            Image::where('_id', $request->id)->update(array('active' => true, 'position' => $request->option));
+        }
+        return Image::all();
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Ad  $ad
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Ad $ad)
+    function activeAd()
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Ad  $ad
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Ad $ad)
-    {
-        //
+        return Image::where('active', true)->get();
     }
 }
