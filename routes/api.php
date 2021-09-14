@@ -41,7 +41,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('ad/update-ad', [App\Http\Controllers\AdController::class, 'updateAd']);
     Route::get('ad/active-ad', [App\Http\Controllers\AdController::class, 'activeAd']);
 
-    //users resource 
+
+    //users resource  
     Route::resource('/users', App\Http\Controllers\UserController::class);
 });
 
