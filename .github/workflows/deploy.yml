@@ -16,5 +16,5 @@ jobs:
      
           script: |
             cd /var/www/ 
-            git clone https://github.com/soman-maharjan/blank-back.git
+            git clone https://soman-maharjan:Sm9841551187@github.com/soman-maharjan/blank-back.git
             echo 'Deployment successful to digital ocean' 
