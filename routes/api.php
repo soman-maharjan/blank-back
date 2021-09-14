@@ -47,7 +47,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
 // Product Management Routes
-Route::get('product', [App\Http\Controllers\ProductController::class, 'index']);
+Route::get('/product', [App\Http\Controllers\ProductController::class, 'index']);
 Route::get('product/{product}', [App\Http\Controllers\ProductController::class, 'show']);
 
 Route::get('category', [App\Http\Controllers\CategoryController::class, 'index']);

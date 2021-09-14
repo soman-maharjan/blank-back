@@ -22,7 +22,6 @@ class ProductController extends Controller
 
     public function store(Request $request)
     {
-
         $data = $request->all();
 
         $validator = Validator::make($data, [
@@ -34,9 +33,6 @@ class ProductController extends Controller
             'variation' => 'required',
             'sku' => 'required',
             'attributes' => 'nullable',
-            'images' => 'required',
-            'image' => 'required',
-            'image.*' => 'mimes:jpeg,jpg,png,gif|max:2048'
         ]);
 
         if ($validator->fails()) {
@@ -56,14 +52,15 @@ class ProductController extends Controller
         $product->variation = $data['variation'];
         $product->attributes = $data['attributes'];
         $product->sku = $data['sku'];
-        $product->images = $data['images'];
         $product->user_id = $data['user_id'];
         $product->is_active = $data['is_active'];
         $product->save();
 
-        if ($request->hasFile('image')) {
-            foreach ($request->file('image') as $file) {
-                $file->storeAs('public/images', $file->getClientOriginalName());
+        foreach ($data['sku'] as $sku) {
+            if ($request->hasFile($sku['sellerSku'])) {
+                foreach ($request->file($sku['sellerSku']) as $file) {
+                    $file->storeAs('public/images', $file->getClientOriginalName());
+                }
             }
         }
 
