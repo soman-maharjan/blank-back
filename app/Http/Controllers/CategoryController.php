@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -88,10 +89,10 @@ class CategoryController extends Controller
 
     public function attribute($category)
     {
-        if($category == "null"){
+        if ($category == "null") {
             return null;
         }
-        
+
         $category = Category::where('title', $category)->first();
         $attributes = $category->attributes;
         $arr = [];
@@ -105,5 +106,10 @@ class CategoryController extends Controller
         }
 
         return $arr;
+    }
+
+    public function product($category)
+    {
+        return Product::where('category', $category)->paginate(3);
     }
 }

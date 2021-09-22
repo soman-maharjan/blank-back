@@ -19,7 +19,6 @@ class OrderController extends Controller
         $cart = $request->cart;
         $address = $request->address;
 
-
         //validating shipping address
         $validator = Validator::make($address, [
             'first_name' => ['required', 'string', 'max:255'],
@@ -55,6 +54,7 @@ class OrderController extends Controller
         //order in the database
         //else return an error
         if ($grandTotal == $cart['total']) {
+            $address['type'] = "delivery";
             $address = Address::create($address);
 
             $order = new Order();

@@ -33,17 +33,20 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     //orders
     Route::post('/order', [App\Http\Controllers\OrderController::class, 'placeOrder']);
-    Route::get('/get-order', [App\Http\Controllers\OrderController::class, 'getOrder']);
+    Route::get('/user-order', [App\Http\Controllers\OrderController::class, 'getOrder']);
 
     //ads
     Route::post('ad', [App\Http\Controllers\AdController::class, 'store']);
     Route::get('ad', [App\Http\Controllers\AdController::class, 'index']);
     Route::post('ad/update-ad', [App\Http\Controllers\AdController::class, 'updateAd']);
-    Route::get('ad/active-ad', [App\Http\Controllers\AdController::class, 'activeAd']);
 
 
     //users resource  
     Route::resource('/users', App\Http\Controllers\UserController::class);
+
+
+    Route::post('pickup-address', [App\Http\Controllers\AddressController::class, 'store']);
+    Route::get('pickup-address/{id}', [App\Http\Controllers\AddressController::class, 'show']);
 });
 
 
@@ -52,10 +55,12 @@ Route::get('/product', [App\Http\Controllers\ProductController::class, 'index'])
 Route::get('product/{product}', [App\Http\Controllers\ProductController::class, 'show']);
 
 Route::get('category', [App\Http\Controllers\CategoryController::class, 'index']);
+Route::get('category/product/{category}', [App\Http\Controllers\CategoryController::class, 'product']);
 
 
 //Search
 Route::get('/search/{value}', [App\Http\Controllers\SearchController::class, 'search']);
+Route::get('ad/active-ad', [App\Http\Controllers\AdController::class, 'activeAd']);
 
 Route::get('/test', function () {
     return auth()->user();
