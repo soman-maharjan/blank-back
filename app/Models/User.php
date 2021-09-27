@@ -2,11 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
+
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 // use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Jenssegers\Mongodb\Auth\User as Authenticatable;
+use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 
 class User extends Authenticatable
 {
@@ -50,5 +52,13 @@ class User extends Authenticatable
     public function products()
     {
         return $this->hasMany(Product::class);
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        ResetPasswordNotification::createUrlUsing(function ($notifiable, string $token) {
+            return 'http://localhost:3000/reset-password/' . $token . '/' . $notifiable->getEmailForPasswordReset();
+        });
+        $this->notify(new ResetPasswordNotification($token));
     }
 }

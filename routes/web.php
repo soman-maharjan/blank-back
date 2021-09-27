@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,4 +26,7 @@ Route::middleware('auth:sanctum')->get('/home', function (Request $request) {
 });
 
 Route::post('/register', [App\Http\Controllers\AuthController::class, 'register']);
+
+// Auth::routes(['verify' => true]);
+
 

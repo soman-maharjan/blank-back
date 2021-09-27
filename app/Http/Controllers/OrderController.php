@@ -14,7 +14,6 @@ class OrderController extends Controller
 {
     public function placeOrder(Request $request)
     {
-        $price = 0;
         $grandTotal = 0;
         $cart = $request->cart;
         $address = $request->address;
@@ -39,16 +38,8 @@ class OrderController extends Controller
             return response()->json($validator->errors(), 422);
         }
 
-        //calculating the total price of products in backend using product sku and quantity from frontend
-        foreach ($cart['products'] as $product) {
-            $prod = Product::where('_id', $product['_id'])->first();
-            foreach ($prod->sku as $sku) {
-                if ($sku['sellerSku'] == $product['sku']['sellerSku']) {
-                    $price = $sku['price'];
-                    $grandTotal += ($price * $product['quantity']);
-                }
-            }
-        }
+        $order = new Order();
+        $grandTotal = $order->getGrandTotal($cart);
 
         //if the grand total calulated in the backend matches with the total from frontend then enter the
         //order in the database
@@ -57,12 +48,10 @@ class OrderController extends Controller
             $address['type'] = "delivery";
             $address = Address::create($address);
 
-            $order = new Order();
             $order->address_id = $address->_id;
             $order->grandTotal = $grandTotal;
             $order->user_id = auth()->user()->id;
             $order->save();
-
 
             foreach ($cart['products'] as $product) {
                 $product['order_id'] = $order->_id;

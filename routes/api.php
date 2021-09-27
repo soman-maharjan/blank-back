@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -47,6 +48,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('pickup-address', [App\Http\Controllers\AddressController::class, 'store']);
     Route::get('pickup-address/{id}', [App\Http\Controllers\AddressController::class, 'show']);
+
+    // Payment Route
+    Route::post('handle-payment', [App\Http\Controllers\PaymentController::class, 'handlePayment'])->name('make.payment');
+    Route::get('cancel-payment', [App\Http\Controllers\PaymentController::class, 'paymentCancel'])->name('cancel.payment');
+    Route::get('payment-success', [App\Http\Controllers\PaymentController::class, 'paymentSuccess'])->name('success.payment');
 });
 
 
@@ -65,3 +71,7 @@ Route::get('ad/active-ad', [App\Http\Controllers\AdController::class, 'activeAd'
 Route::get('/test', function () {
     return auth()->user();
 });
+
+
+Route::post('/forgot-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendEmail']);
+Route::post('/reset-password', [App\Http\Controllers\Auth\ResetPasswordController::class, 'resetPassword']);
