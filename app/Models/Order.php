@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 // use Illuminate\Database\Eloquent\Model;
 use Jenssegers\Mongodb\Eloquent\Model;
@@ -20,6 +21,11 @@ class Order extends Model
         return $this->hasMany(SubOrder::class);
     }
 
+    public function address()
+    {
+        return $this->belongsTo(Address::class);
+    }
+
     public function getGrandTotal($cart)
     {
         $grandTotal = 0;
@@ -34,5 +40,42 @@ class Order extends Model
             }
         }
         return $grandTotal;
+    }
+
+    public function storeOrder($cart, $address)
+    {
+        $order = new Order();
+        $grandTotal = $order->getGrandTotal($cart);
+
+        //if the grand total calulated in the backend matches with the total from frontend then enter the
+        //order in the database
+        //else return an error
+        if ($grandTotal == $cart['total']) {
+            $address['type'] = "delivery";
+            $address = Address::create($address);
+
+            $order->address_id = $address->_id;
+            $order->grandTotal = $grandTotal;
+            $order->user_id = auth()->user()->id;
+            $order->save();
+
+            foreach ($cart['products'] as $product) {
+                $product['order_id'] = $order->_id;
+                $product['status'] = "pending";
+                $product['created_at'] = Carbon::now();
+                $product['updated_at'] = Carbon::now();
+                SubOrder::create($product);
+            }
+
+            $data =
+                [
+                    'products' => $cart['products'],
+                    'address' => $address,
+                    'grandTotal' => $grandTotal,
+                    'orderId' => $order->_id
+                ];
+
+            return $data;
+        }
     }
 }

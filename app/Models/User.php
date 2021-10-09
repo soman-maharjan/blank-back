@@ -27,7 +27,7 @@ class User extends Authenticatable
         'email',
         'password',
         'phone_number',
-        'description'
+        'bio'
     ];
 
     /**
@@ -52,6 +52,16 @@ class User extends Authenticatable
     public function products()
     {
         return $this->hasMany(Product::class);
+    }
+
+    public function followers()
+    {
+        return $this->hasOne(Follower::class);
+    }
+
+    public function followings()
+    {
+        return $this->hasOne(Following::class);
     }
 
     public function sendPasswordResetNotification($token)

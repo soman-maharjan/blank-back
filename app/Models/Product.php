@@ -16,7 +16,6 @@ class Product extends Model
     // protected $fillable = ['productName', 'description', 'category', 'boxContents', 'color', 'sku', 'attributes', 'images'];
     protected $guarded = [];
 
-
     public function user()
     {
         return $this->belongsTo(User::class);

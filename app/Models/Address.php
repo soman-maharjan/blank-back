@@ -14,4 +14,9 @@ class Address extends Model
     protected $collection = 'addresses';
 
     protected $guarded = [];
+
+    public function order()
+    {
+        return $this->hasOne(Order::class);
+    }
 }

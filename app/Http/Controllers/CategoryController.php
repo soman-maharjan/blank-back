@@ -110,6 +110,6 @@ class CategoryController extends Controller
 
     public function product($category)
     {
-        return Product::where('category', $category)->paginate(3);
+        return Product::where('category', $category)->get();
     }
 }

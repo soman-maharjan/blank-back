@@ -13,6 +13,11 @@ class ProductController extends Controller
         return Product::where('is_active', true)->get();
     }
 
+    public function allProducts()
+    {
+        return Product::all();
+    }
+
     public function create()
     {
         //
@@ -116,6 +121,7 @@ class ProductController extends Controller
         $product->sku = $data['sku'];
         $product->attributes = $data['attributes'];
         $product->image = $data['image'];
+        $product->is_verified = false;
 
         $product->save();
 
@@ -125,7 +131,7 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         $product->delete();
-        return $this->userProduct();
+        return response()->json(['message' => 'Product Deleted!'], 200);
     }
 
     public function userProduct()

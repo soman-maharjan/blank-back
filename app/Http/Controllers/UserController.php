@@ -44,9 +44,14 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(User $user)
     {
-        //
+        return $user;
+    }
+
+    public function username(User $user)
+    {
+        return $user->name;
     }
 
     /**
@@ -67,9 +72,14 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, User $user)
     {
-        //
+        $user->name = $request->name;
+        $user->bio = $request->bio;
+        $user->email = $request->email;
+        if ($user->save()) {
+            return response()->json(['message' => 'Updated!'], 200);
+        }
     }
 
     /**
@@ -81,6 +91,6 @@ class UserController extends Controller
     public function destroy($id)
     {
         User::destroy($id);
-        return User::all();
+        return response()->json(['message' => 'User Deleted!'], 200);
     }
 }
