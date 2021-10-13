@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\NewProduct;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -73,11 +74,11 @@ Route::get('/product', [App\Http\Controllers\ProductController::class, 'index'])
 Route::get('product/{product}', [App\Http\Controllers\ProductController::class, 'show']);
 
 Route::get('category', [App\Http\Controllers\CategoryController::class, 'index']);
-Route::get('category/product/{category}', [App\Http\Controllers\CategoryController::class, 'product']);
+Route::post('category/product', [App\Http\Controllers\CategoryController::class, 'product']);
 
 
 //Search
-Route::get('/search/{value}', [App\Http\Controllers\SearchController::class, 'search']);
+Route::post('/search', [App\Http\Controllers\SearchController::class, 'filter']);
 Route::get('ad/active-ad', [App\Http\Controllers\AdController::class, 'activeAd']);
 
 Route::get('/test', function () {

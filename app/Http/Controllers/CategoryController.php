@@ -108,8 +108,28 @@ class CategoryController extends Controller
         return $arr;
     }
 
-    public function product($category)
+    public function product(Request $request)
     {
-        return Product::where('category', $category)->get();
+        $product = new Product();
+
+        $fuzzySearch = implode("%", str_split($request->value)); // e.g. test -> t%e%s%t
+        $fuzzySearch = "%$fuzzySearch%";
+
+        return $product->where('category', 'like', $fuzzySearch)
+            ->when($request->min != null, function ($q) {
+                return $q->whereRaw([
+                    "sku.price" => ['$gt' => (float) request('min')]
+                ]);
+            })
+            ->when($request->max != null, function ($q) {
+                return $q->whereRaw([
+                    "sku.price" => ['$lt' => (float)request('max')]
+                ]);
+            })
+            ->when($request->rating != "0", function ($q) {
+                return $q->whereRaw([
+                    "rating" => ['$gte' => (int) request('rating')]
+                ]);
+            })->get();
     }
 }

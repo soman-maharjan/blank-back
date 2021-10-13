@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewProduct;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -66,6 +67,8 @@ class ProductController extends Controller
                 }
             }
         }
+
+        broadcast(new NewProduct($product));
 
         return response(['message' => 'Product Created!'], 201);
     }
