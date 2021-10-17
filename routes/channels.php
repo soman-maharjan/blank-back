@@ -18,6 +18,7 @@ Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
 
-Broadcast::channel('private.{userId}', function ($user, $userId) {
-    return in_array($userId, $user->followers);
+Broadcast::channel('products.{userId}', function ($user, $userId) {
+    return $user->id == $userId;
+    // return in_array($userId, $user->followers->followers);
 });

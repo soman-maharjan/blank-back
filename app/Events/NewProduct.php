@@ -2,9 +2,7 @@
 
 namespace App\Events;
 
-use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
@@ -38,7 +36,7 @@ class NewProduct implements ShouldBroadcast
         $arr = [];
         if ($followers != []) {
             foreach ($followers as $follower) {
-                $arr[] = new PrivateChannel("private." . $follower);
+                $arr[] = new PrivateChannel("products." . $follower);
             }
         }
 

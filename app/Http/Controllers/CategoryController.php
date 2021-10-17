@@ -130,6 +130,6 @@ class CategoryController extends Controller
                 return $q->whereRaw([
                     "rating" => ['$gte' => (int) request('rating')]
                 ]);
-            })->get();
+            })->paginate(20);
     }
 }

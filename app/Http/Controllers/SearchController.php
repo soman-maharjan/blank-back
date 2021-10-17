@@ -7,19 +7,11 @@ use Illuminate\Http\Request;
 
 class SearchController extends Controller
 {
-    // public function search($value)
-    // {
-    //     // $fuzzySearch = implode("%", str_split($word)); // e.g. test -> t%e%s%t
-    //     // $fuzzySearch = "%$fuzzySearch%";
-
-    //     Product::filter()->get();
-    // }
-
     public function filter(Request $request)
     {
         $product = new Product();
 
-        $fuzzySearch = implode("%", str_split($request->value)); // e.g. test -> t%e%s%t
+        $fuzzySearch = implode("%", str_split($request->value));
         $fuzzySearch = "%$fuzzySearch%";
 
         return $product->where('productName', 'like', $fuzzySearch)
@@ -33,24 +25,11 @@ class SearchController extends Controller
                     "sku.price" => ['$lt' => (float)request('max')]
                 ]);
             })
-            ->when($request->rating != "", function ($q) {
+            ->when($request->rating != "0", function ($q) {
                 return $q->whereRaw([
                     "rating" => ['$gte' => (int) request('rating')]
                 ]);
-            })->get();
-
-        // if ($request->min) {
-        //     $product = $product->whereRaw([
-        //         "sku.price" => ['$gt' => (float)2000]
-        //     ]);
-        // }
-
-        // if ($request->max) {
-        //     $product = $product->whereRaw([
-        //         "sku.price" => ['$lt' => (float)3000]
-        //     ]);
-        // }
-
-        // return $product->get();
+            })
+            ->paginate(20);
     }
 }

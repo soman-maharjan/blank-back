@@ -1,8 +1,8 @@
 <?php
 
-use App\Events\NewProduct;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,6 +27,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::middleware(['auth:sanctum'])->group(function () {
     //Category Routes
+
+    Broadcast::routes();
+
     Route::resource('category', App\Http\Controllers\CategoryController::class, ['except' => ['index']]);
     Route::get('category/attribute/{category}', [App\Http\Controllers\CategoryController::class, 'attribute']);
 
@@ -52,6 +55,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::resource('/users', App\Http\Controllers\UserController::class);
     Route::get('users/username/{user}', [App\Http\Controllers\UserController::class, 'username']);
 
+    //Shipping Routes
     Route::post('validate-address', [App\Http\Controllers\AddressController::class, 'validateAddress']);
 
     Route::post('pickup-address', [App\Http\Controllers\AddressController::class, 'store']);
@@ -61,12 +65,16 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('handle-payment', [App\Http\Controllers\PaymentController::class, 'handlePayment'])->name('make.payment');
     Route::get('payment', [App\Http\Controllers\PaymentController::class, 'index']);
 
+    //social Routes
     Route::post('follow', [App\Http\Controllers\FollowingController::class, 'follow']);
     Route::post('unfollow', [App\Http\Controllers\FollowingController::class, 'unfollow']);
 
     Route::post('following', [App\Http\Controllers\FollowingController::class, 'following']);
     Route::get('follower', [App\Http\Controllers\FollowerController::class, 'follower']);
+
+
 });
+Route::get('/feed', [App\Http\Controllers\FeedController::class, 'feed']);
 
 
 // Product Management Routes
@@ -82,7 +90,15 @@ Route::post('/search', [App\Http\Controllers\SearchController::class, 'filter'])
 Route::get('ad/active-ad', [App\Http\Controllers\AdController::class, 'activeAd']);
 
 Route::get('/test', function () {
-    return auth()->user();
+    // $followers = auth()->user()->followers->followers;
+    // $arr = [];
+    // if ($followers != []) {
+    //     foreach ($followers as $follower) {
+    //         $arr[] = new PrivateChannel($follower);
+    //     }
+    // }
+
+    // return $arr;
 });
 
 
