@@ -35,7 +35,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
 
 
-    Route::resource('product', App\Http\Controllers\ProductController::class, ['except' => ['index', 'show']]);
+    Route::resource('product', App\Http\Controllers\ProductController::class, ['except' => ['index', 'show', 'update', 'edit']]);
     Route::post('product/image', [App\Http\Controllers\ProductController::class, 'image']);
     Route::post('product-status/{product}', [App\Http\Controllers\ProductController::class, 'changeStatus']);
     Route::get('user-product', [App\Http\Controllers\ProductController::class, 'userProduct']);
@@ -43,7 +43,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     //orders
     // Route::post('/order', [App\Http\Controllers\OrderController::class, 'placeOrder']);
-    Route::get('/user-order', [App\Http\Controllers\OrderController::class, 'getOrder']);
+    Route::get('/seller-order', [App\Http\Controllers\OrderController::class, 'getSellerOrder']);
+    Route::get('/user-order', [App\Http\Controllers\OrderController::class, 'getUserOrder']);
     Route::get('/sub-order/{order}', [App\Http\Controllers\OrderController::class, 'subOrder']);
 
     //ads
@@ -71,8 +72,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('following', [App\Http\Controllers\FollowingController::class, 'following']);
     Route::get('follower', [App\Http\Controllers\FollowerController::class, 'follower']);
-
-
 });
 Route::get('/feed', [App\Http\Controllers\FeedController::class, 'feed']);
 

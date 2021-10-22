@@ -73,9 +73,21 @@ class OrderController extends Controller
     //     return response()->json('Error!', 422);
     // }
 
-    public function getOrder()
+    public function getSellerOrder()
     {
         return SubOrder::where('user_id', auth()->user()->id)->get();
+    }
+
+    public function getUserOrder()
+    {
+        $allOrders = [];
+
+        $orders = Order::where('user_id', auth()->user()->id)->get();
+        foreach ($orders as $order) {
+            $allOrders[] = $order->suborders;
+        }
+
+        return collect($allOrders)->flatten(1)->toArray();
     }
 
     public function subOrder(Order $order)

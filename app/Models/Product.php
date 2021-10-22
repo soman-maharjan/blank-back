@@ -15,19 +15,11 @@ class Product extends Model
 
     // protected $fillable = ['productName', 'description', 'category', 'boxContents', 'color', 'sku', 'attributes', 'images'];
     protected $guarded = [];
-    protected $filters = ['like'];
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-
-    // public function search(string $word)
-    // {
-    //     $fuzzySearch = implode("%", str_split($word)); // e.g. test -> t%e%s%t
-    //     $fuzzySearch = "%$fuzzySearch%";
-    //     return Product::where('productName', 'like', $fuzzySearch)->get();
-    // }
 
     public function userProducts()
     {

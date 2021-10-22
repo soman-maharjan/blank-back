@@ -28,7 +28,8 @@ class AuthController extends Controller
             'email' => $request['email'],
             'password' => Hash::make($request['password']),
             // 'phone_number' => $request['phone_number'],
-            'bio' => null
+            'bio' => null,
+            'profileImage' => "default.jpg"
         ]);
 
         return response(['success' => true], 200);

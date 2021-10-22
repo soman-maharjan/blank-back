@@ -58,6 +58,7 @@ class ProductController extends Controller
         $product->sku = $data['sku'];
         $product->user_id = $data['user_id'];
         $product->is_active = $data['is_active'];
+        $product->rating = 0;
         $product->save();
 
         foreach ($data['sku'] as $sku) {

@@ -3,18 +3,29 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Http\Request;
+use Illuminate\Database\Eloquent\Collection;
 
 class FeedController extends Controller
 {
     public function feed()
     {
-        $followings = User::where('_id', "61629ae42c3800001a003c73")->first()->followings->followings;
+        $followings = auth()->user()->followings->followings;
+
+        $merged = new Collection();
+
         if ($followings != []) {
             foreach ($followings as $following) {
                 $user = User::where('_id', $following)->first();
-                return collect($user->products)->sortBy('rating');
+                $merged = $merged->merge($user->products);
             }
+
+            return $merged->sortByDesc('created_at')->values();
         }
+
+        return response()->json(["message" => "No Products"], 422);
+
+
+        // $product =  DB::table('products')->get();
+        // return $product->sortByDesc('created_at')->values();
     }
 }
