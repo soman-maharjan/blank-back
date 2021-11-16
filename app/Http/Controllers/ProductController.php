@@ -59,6 +59,7 @@ class ProductController extends Controller
         $product->user_id = $data['user_id'];
         $product->is_active = $data['is_active'];
         $product->rating = 0;
+        $product->is_verified = false;
         $product->save();
 
         foreach ($data['sku'] as $sku) {
@@ -72,17 +73,6 @@ class ProductController extends Controller
         broadcast(new NewProduct($product));
 
         return response(['message' => 'Product Created!'], 201);
-    }
-
-    public function image(Request $request)
-    {
-        return $request;
-
-        foreach ($request->file('image') as $file) {
-            $file->storeAs('public/images', $file->getClientOriginalName());
-        }
-
-        return response()->json(['messsage' => "Image Uploaded"], 200);
     }
 
     public function show(Product $product)

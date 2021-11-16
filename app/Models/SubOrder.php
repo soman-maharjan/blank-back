@@ -15,7 +15,13 @@ class SubOrder extends Model
 
     protected $guarded = [];
 
-    public function orders(){
+    public function orders()
+    {
         $this->belongsTo(Order::class);
+    }
+
+    public function review()
+    {
+        return $this->hasOne(Review::class);
     }
 }

@@ -33,10 +33,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::resource('category', App\Http\Controllers\CategoryController::class, ['except' => ['index']]);
     Route::get('category/attribute/{category}', [App\Http\Controllers\CategoryController::class, 'attribute']);
 
-
-
     Route::resource('product', App\Http\Controllers\ProductController::class, ['except' => ['index', 'show', 'update', 'edit']]);
-    Route::post('product/image', [App\Http\Controllers\ProductController::class, 'image']);
     Route::post('product-status/{product}', [App\Http\Controllers\ProductController::class, 'changeStatus']);
     Route::get('user-product', [App\Http\Controllers\ProductController::class, 'userProduct']);
     Route::get('all-product', [App\Http\Controllers\ProductController::class, 'allProducts']);
@@ -72,8 +69,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('following', [App\Http\Controllers\FollowingController::class, 'following']);
     Route::get('follower', [App\Http\Controllers\FollowerController::class, 'follower']);
+
+    Route::post('/change-password', [App\Http\Controllers\AuthController::class, 'changePassword']);
+
+    Route::get('/feed', [App\Http\Controllers\FeedController::class, 'feed']);
+
+    //reviews
+    Route::get('/review', [App\Http\Controllers\ReviewController::class, 'index']);
+    Route::get('/unreviewed', [App\Http\Controllers\ReviewController::class, 'unreviewed']);
 });
-Route::get('/feed', [App\Http\Controllers\FeedController::class, 'feed']);
 
 
 // Product Management Routes
@@ -89,15 +93,7 @@ Route::post('/search', [App\Http\Controllers\SearchController::class, 'filter'])
 Route::get('ad/active-ad', [App\Http\Controllers\AdController::class, 'activeAd']);
 
 Route::get('/test', function () {
-    // $followers = auth()->user()->followers->followers;
-    // $arr = [];
-    // if ($followers != []) {
-    //     foreach ($followers as $follower) {
-    //         $arr[] = new PrivateChannel($follower);
-    //     }
-    // }
-
-    // return $arr;
+    return auth()->user();
 });
 
 

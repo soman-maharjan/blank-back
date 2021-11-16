@@ -80,14 +80,8 @@ class OrderController extends Controller
 
     public function getUserOrder()
     {
-        $allOrders = [];
-
-        $orders = Order::where('user_id', auth()->user()->id)->get();
-        foreach ($orders as $order) {
-            $allOrders[] = $order->suborders;
-        }
-
-        return collect($allOrders)->flatten(1)->toArray();
+        $order = new Order;
+        return $order->userSubOrders();
     }
 
     public function subOrder(Order $order)

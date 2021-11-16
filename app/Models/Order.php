@@ -26,6 +26,11 @@ class Order extends Model
         return $this->belongsTo(Address::class);
     }
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function getGrandTotal($cart)
     {
         $grandTotal = 0;
@@ -77,5 +82,17 @@ class Order extends Model
 
             return $data;
         }
+    }
+
+    public function userSubOrders()
+    {
+        $subOrders = [];
+
+        $orders = Order::where('user_id', auth()->user()->id)->get();
+        foreach ($orders as $order) {
+            $subOrders[] = $order->suborders;
+        }
+
+        return collect($subOrders)->flatten(1)->toArray();
     }
 }
