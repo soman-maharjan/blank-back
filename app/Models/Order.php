@@ -67,6 +67,7 @@ class Order extends Model
             foreach ($cart['products'] as $product) {
                 $product['order_id'] = $order->_id;
                 $product['status'] = "pending";
+                $product['product_id'] = $product['_id'];
                 $product['created_at'] = Carbon::now();
                 $product['updated_at'] = Carbon::now();
                 SubOrder::create($product);

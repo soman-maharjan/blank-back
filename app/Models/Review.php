@@ -23,6 +23,11 @@ class Review extends Model
 
     public function suborder()
     {
-        return $this->hasOne(SubOrder::class);
+        return $this->belongsTo(SubOrder::class, 'suborder_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

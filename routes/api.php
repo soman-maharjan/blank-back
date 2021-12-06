@@ -76,7 +76,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     //reviews
     Route::get('/review', [App\Http\Controllers\ReviewController::class, 'index']);
+    Route::get('/reviews/{product}', [App\Http\Controllers\ReviewController::class, 'reviews']);
+    Route::post('/review', [App\Http\Controllers\ReviewController::class, 'store']);
+    Route::delete('/review/{review}', [App\Http\Controllers\ReviewController::class, 'destroy']);
     Route::get('/unreviewed', [App\Http\Controllers\ReviewController::class, 'unreviewed']);
+
+
+    //sub order
+    Route::get('/suborder/{suborder}', [App\Http\Controllers\SubOrderController::class, 'show']);
 });
 
 

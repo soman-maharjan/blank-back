@@ -22,6 +22,6 @@ class SubOrder extends Model
 
     public function review()
     {
-        return $this->hasOne(Review::class);
+        return $this->hasOne(Review::class, 'subOrder_id', '_id');
     }
 }
