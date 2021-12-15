@@ -36,6 +36,8 @@ class ReviewController extends Controller
         $review->product_id = $request->product_id;
         $review->save();
 
+        $review->updateProductRating($request->product_id);
+
         return $this->unreviewed();
     }
 

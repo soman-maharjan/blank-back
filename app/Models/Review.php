@@ -30,4 +30,11 @@ class Review extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function updateProductRating($id)
+    {
+        $product = Product::findOrFail($id);
+        $newRating = Review::where('product_id', $id)->pluck('rating')->avg();
+        $product->update(['rating' => $newRating]);
+    }
 }

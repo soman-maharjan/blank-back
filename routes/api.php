@@ -49,7 +49,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('ad', [App\Http\Controllers\AdController::class, 'index']);
     Route::post('ad/update-ad', [App\Http\Controllers\AdController::class, 'updateAd']);
 
-    //users resource  
+    //users resource
     Route::resource('/users', App\Http\Controllers\UserController::class);
     Route::get('users/username/{user}', [App\Http\Controllers\UserController::class, 'username']);
 
@@ -80,6 +80,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/review', [App\Http\Controllers\ReviewController::class, 'store']);
     Route::delete('/review/{review}', [App\Http\Controllers\ReviewController::class, 'destroy']);
     Route::get('/unreviewed', [App\Http\Controllers\ReviewController::class, 'unreviewed']);
+
+
+    Route::get('/product/verify/{product}', [App\Http\Controllers\ProductController::class, 'verify']);
 
 
     //sub order

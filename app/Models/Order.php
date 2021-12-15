@@ -70,6 +70,7 @@ class Order extends Model
                 $product['product_id'] = $product['_id'];
                 $product['created_at'] = Carbon::now();
                 $product['updated_at'] = Carbon::now();
+                unset($product['is_active'],$product['is_verified'], $product['rating']);
                 SubOrder::create($product);
             }
 

@@ -141,4 +141,10 @@ class ProductController extends Controller
         $p = new Product();
         return $p->userProducts();
     }
+
+    public function verify(Product $product){
+        $product->is_verified = !$product->is_verified;
+        $product->save();
+        return $product;
+    }
 }
