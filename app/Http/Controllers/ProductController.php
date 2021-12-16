@@ -28,6 +28,10 @@ class ProductController extends Controller
     {
         $data = $request->all();
 
+        foreach($data['sku'] as $key => $sku){
+            $data['sku'][$key]['price'] = (double)$data['sku'][$key]['price'];
+        }
+
         $validator = Validator::make($data, [
             'productName' => 'required|max:255',
             'description' => 'nullable',

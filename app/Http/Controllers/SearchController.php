@@ -17,17 +17,17 @@ class SearchController extends Controller
         return $product->where('productName', 'like', $fuzzySearch)
             ->when($request->min != "", function ($q) {
                 return $q->whereRaw([
-                    "sku.price" => ['$gt' => (float) request('min')]
+                    "sku.price" => ['$gt' => (double)request('min')]
                 ]);
             })
             ->when($request->max != "", function ($q) {
                 return $q->whereRaw([
-                    "sku.price" => ['$lt' => (float)request('max')]
+                    "sku.price" => ['$lt' => (double)request('max')]
                 ]);
             })
             ->when($request->rating != "0", function ($q) {
                 return $q->whereRaw([
-                    "rating" => ['$gte' => (int) request('rating')]
+                    "rating" => ['$gte' => (int)request('rating')]
                 ]);
             })
             ->paginate(20);
