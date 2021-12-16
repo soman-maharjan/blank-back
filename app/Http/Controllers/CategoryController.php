@@ -132,4 +132,10 @@ class CategoryController extends Controller
                 ]);
             })->paginate(20);
     }
+
+    public function categoryProduct($category){
+        $arr = Category::where('parent', $category)->pluck('title');
+        $arr[] = $category;
+        return Product::whereIn('category', $arr)->take(20)->get();
+    }
 }

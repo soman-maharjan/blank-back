@@ -96,6 +96,7 @@ Route::get('product/{product}', [App\Http\Controllers\ProductController::class, 
 
 Route::get('category', [App\Http\Controllers\CategoryController::class, 'index']);
 Route::post('category/product', [App\Http\Controllers\CategoryController::class, 'product']);
+Route::get('category/product/{category}', [App\Http\Controllers\CategoryController::class, 'categoryProduct']);
 
 
 //Search
