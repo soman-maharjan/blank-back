@@ -9,13 +9,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 use Jenssegers\Mongodb\Auth\User as Authenticatable;
 use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
+use Maklad\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
     protected $connection = 'mongodb';
     protected $collection = 'users';
 
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRoles;
+
+    protected $guard_name = 'web';
 
     /**
      * The attributes that are mass assignable.

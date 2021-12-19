@@ -4,6 +4,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
+use Maklad\Permission\Models\Permission;
+use Maklad\Permission\Models\Role;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,6 +24,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     $data['following'] = $user->followings->followings;
     $data['follower'] = $user->followers->followers;
     $data['success'] = true;
+    $data['roles'] = $user->getRoleNames();
     return $data;
 });
 
@@ -87,6 +90,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     //sub order
     Route::get('/suborder/{suborder}', [App\Http\Controllers\SubOrderController::class, 'show']);
+
+    //get all available roles
+    Route::get('/roles', [App\Http\Controllers\RoleController::class, 'index']);
+
 });
 
 
@@ -104,7 +111,10 @@ Route::post('/search', [App\Http\Controllers\SearchController::class, 'filter'])
 Route::get('ad/active-ad', [App\Http\Controllers\AdController::class, 'activeAd']);
 
 Route::get('/test', function () {
-    return auth()->user();
+    $role = Role::create(['name' => 'admin']);
+    $permission = Permission::create(['name' => 'access admin dashboard']);
+
+    $role->givePermissionTo($permission);
 });
 
 
