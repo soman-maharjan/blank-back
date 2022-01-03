@@ -77,8 +77,19 @@ class UserController extends Controller
         $user->name = $request->name;
         $user->bio = $request->bio;
         $user->email = $request->email;
+//        return $request;
+        foreach ($request->roles as $roles) {
+            if ($roles[array_keys($roles)[0]] == true) {
+                $user->assignRole(array_keys($roles)[0]);
+            } else {
+                $user->removeRole(array_keys($roles)[0]);
+            }
+        }
         if ($user->save()) {
-            return response()->json(['message' => 'Updated!'], 200);
+            unset($user['role_ids']);
+            $user->role = $user->roles->pluck('name');
+            unset($user['roles']);
+            return response()->json(['message' => 'Updated!', 'data' => $user], 200);
         }
     }
 

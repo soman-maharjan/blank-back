@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Image;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class AdController extends Controller
 {
@@ -29,6 +28,7 @@ class AdController extends Controller
                 $img->extension = $extension;
                 $img->position = null;
                 $img->active = false;
+                $img->redirectLink = $request->redirectLink;
                 $img->save();
             }
 
@@ -44,7 +44,11 @@ class AdController extends Controller
     public function updateAd(Request $request)
     {
         if ($request->option == 'delete') {
-            Image::destroy($request->id);
+            $image = Image::find($request->id);
+            if (\File::exists(storage_path('app/public/images/' . $image->filename))) {
+                \File::delete(storage_path('app/public/images/' . $image->filename));
+            }
+            $image->delete();
         } else {
             $product = Image::all()->where('active', '=', true)->where('position', '=', $request->option)->first();
 

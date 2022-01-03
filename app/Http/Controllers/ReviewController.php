@@ -67,6 +67,11 @@ class ReviewController extends Controller
 
     public function destroy(Review $review)
     {
+        foreach ($review->images as $img) {
+            if (\File::exists(storage_path('app/public/images/' . $img))) {
+                \File::delete(storage_path('app/public/images/' . $img));
+            }
+        }
         $review->delete();
         return response(['message' => 'Review Deleted!'], 201);
     }

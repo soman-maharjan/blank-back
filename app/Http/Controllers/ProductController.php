@@ -28,7 +28,7 @@ class ProductController extends Controller
     {
         $data = $request->all();
 
-        foreach($data['sku'] as $key => $sku){
+        foreach ($data['sku'] as $key => $sku) {
             $data['sku'][$key]['price'] = (double)$data['sku'][$key]['price'];
         }
 
@@ -128,6 +128,17 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
+        $images = [];
+        foreach ($product->sku as $sku) {
+            $images = array_merge($images, $sku['images']);
+        }
+
+        foreach ($images as $img) {
+            if (\File::exists(storage_path('app/public/images/' . $img))) {
+                \File::delete(storage_path('app/public/images/' . $img));
+            }
+        }
+
         $product->delete();
         return response()->json(['message' => 'Product Deleted!'], 200);
     }
@@ -146,7 +157,8 @@ class ProductController extends Controller
         return $p->userProducts();
     }
 
-    public function verify(Product $product){
+    public function verify(Product $product)
+    {
         $product->is_verified = !$product->is_verified;
         $product->save();
         return $product;
