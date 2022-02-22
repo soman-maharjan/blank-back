@@ -10,18 +10,14 @@ class FeedController extends Controller
     public function feed()
     {
         $followings = auth()->user()->followings->followings;
-
         $merged = new Collection();
-
         if ($followings != []) {
             foreach ($followings as $following) {
                 $user = User::where('_id', $following)->first();
-                $merged = $merged->merge($user->products);
+                $merged = $merged->merge($user->activeProducts($user));
             }
-
             return $merged->sortByDesc('created_at')->values();
         }
-
         return response()->json(["message" => "No Products"], 422);
 
 

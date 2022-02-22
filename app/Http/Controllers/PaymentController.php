@@ -22,9 +22,9 @@ class PaymentController extends Controller
         if ($request->type == 'KHALTI') {
 
             $data = [
-                'user_id'     => auth()->user()->id,
-                'mobile'     => $request->mobile,
-                'amount'     => ($request->amount / 100.00),
+                'user_id' => auth()->user()->id,
+                'mobile' => $request->mobile,
+                'amount' => ($request->amount / 100.00),
                 'pre_token' => $request->token,
                 'status' => 0,
                 'order_id' => null,
@@ -40,7 +40,7 @@ class PaymentController extends Controller
 
                 $serverProductIdentity = explode(",", $request->product_identity);
 
-                $cartProductIdentity = (array) null;
+                $cartProductIdentity = (array)null;
                 foreach ($request->cart['products'] as $product) {
                     $cartProductIdentity[] = $product['_id'];
                 }

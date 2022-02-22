@@ -94,6 +94,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     //get all available roles
     Route::get('/roles', [App\Http\Controllers\RoleController::class, 'index']);
 
+    //comments
+    Route::resource('comments', App\Http\Controllers\CommentController::class)->except(['index']);
 });
 
 
@@ -105,6 +107,8 @@ Route::get('category', [App\Http\Controllers\CategoryController::class, 'index']
 Route::post('category/product', [App\Http\Controllers\CategoryController::class, 'product']);
 Route::get('category/product/{category}', [App\Http\Controllers\CategoryController::class, 'categoryProduct']);
 
+//comments
+Route::get('comments/{productId}', [App\Http\Controllers\CommentController::class, 'index']);
 
 //Search
 Route::post('/search', [App\Http\Controllers\SearchController::class, 'filter']);

@@ -78,6 +78,18 @@ class User extends Authenticatable
         return $this->hasMany(Review::class);
     }
 
+    public function activeProducts($user){
+        $activeProducts = Product::where('user_id', $user->id)
+            ->where('is_active', true)
+            ->where('is_verified', true)
+            ->get();
+        //attach user name to products
+        return $activeProducts->map(function($product) use ($user){
+            $product['name'] = $user->name;
+            return $product;
+        });
+    }
+
     public function sendPasswordResetNotification($token)
     {
         ResetPasswordNotification::createUrlUsing(function ($notifiable, string $token) {

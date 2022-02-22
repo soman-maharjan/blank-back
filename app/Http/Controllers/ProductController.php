@@ -30,6 +30,7 @@ class ProductController extends Controller
 
         foreach ($data['sku'] as $key => $sku) {
             $data['sku'][$key]['price'] = (double)$data['sku'][$key]['price'];
+            $data['sku'][$key]['quantity'] = (int)$data['sku'][$key]['quantity'];
         }
 
         $validator = Validator::make($data, [
@@ -73,8 +74,6 @@ class ProductController extends Controller
                 }
             }
         }
-
-        broadcast(new NewProduct($product));
 
         return response(['message' => 'Product Created!'], 201);
     }
@@ -161,6 +160,9 @@ class ProductController extends Controller
     {
         $product->is_verified = !$product->is_verified;
         $product->save();
+        if($product->is_verified && $product->is_active){
+            broadcast(new NewProduct($product));
+        }
         return $product;
     }
 }
