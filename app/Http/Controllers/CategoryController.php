@@ -137,6 +137,6 @@ class CategoryController extends Controller
     public function categoryProduct($category){
         $arr = Category::where('parent', $category)->pluck('title');
         $arr[] = $category;
-        return Product::whereIn('category', $arr)->take(20)->get();
+        return Product::whereIn('category', $arr)->take(15)->get();
     }
 }

@@ -3,8 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-// use Illuminate\Database\Eloquent\Model;
 use Jenssegers\Mongodb\Eloquent\Model;
+
+// use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
@@ -30,5 +31,10 @@ class Product extends Model
     {
         $user = User::where('_id', auth()->user()->_id)->first();
         return $user->products;
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
 }

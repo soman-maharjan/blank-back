@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Events\NewProduct;
 use App\Models\Product;
+use App\Models\SubOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -80,7 +81,15 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        return $product;
+//        return $product;
+//        return $product = $product->load(['user' => function($query){
+////            $query->unset('email');
+//        }]);
+        $p = $product->load(['user']);
+        $username = $p->user->name;
+        $p->unset('user');
+        $p['username'] = $username;
+        return $p;
     }
 
     public function edit(Product $product)
@@ -160,9 +169,70 @@ class ProductController extends Controller
     {
         $product->is_verified = !$product->is_verified;
         $product->save();
-        if($product->is_verified && $product->is_active){
+        if ($product->is_verified && $product->is_active) {
             broadcast(new NewProduct($product));
         }
         return $product;
+    }
+
+    public function topSelling()
+    {
+        $ids = SubOrder::raw(function ($collection) {
+            return $collection->aggregate([
+                ['$group' => [
+                    '_id' => '$product_id',
+                    'count' => ['$sum' => 1]
+                ]],
+                ['$sort' => [
+                    'count' => -1
+                ]]
+            ]);
+        })->take(15);
+
+
+        foreach ($ids as $id) {
+            $p = Product::where('_id', $id->_id)
+                ->where('is_active', true)
+                ->where('is_verified', true)
+                ->first();
+            if($p != null){
+                $products[] = $p;
+            }
+        }
+
+        return $products;
+
+//        return \DB::table('suborders')
+//            ->selectRaw('productName')
+//            ->selectRaw('count(suborders)')
+//            ->groupBy('product_id')
+//            ->get();
+//        return SubOrder::all()
+//            ->groupBy('product_id')
+//            ->take(15);
+    }
+
+    public function similar(Product $product)
+    {
+        foreach ($product->sku as $sku) {
+            $prices[] = $sku['price'];
+        }
+        if (sizeof($prices) == 1) {
+            $prices[] = 0;
+        }
+
+        $min = min($prices);
+        $max = max($prices);
+
+        return Product::where('productName', 'like', '%' . implode('%', str_split($product->productName)) . '%')
+            ->orWhere('category', 'like', $product->category)
+            ->orWhere('color', 'like', $product->color)
+            ->orWhere('boxContents', 'like', $product->boxContents)
+            ->orWhere(function ($query) use ($min, $max) {
+                $query->orWhereRaw([
+                    "sku.price" => [['$gt' => $min], ['$lt' => $max]]
+                ]);
+            })
+            ->take(15)->get();
     }
 }

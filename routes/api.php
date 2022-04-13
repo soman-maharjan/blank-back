@@ -4,8 +4,6 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
-use Maklad\Permission\Models\Permission;
-use Maklad\Permission\Models\Role;
 
 /*
 |--------------------------------------------------------------------------
@@ -79,6 +77,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     //reviews
     Route::get('/review', [App\Http\Controllers\ReviewController::class, 'index']);
+    Route::get('/reviews/seller', [App\Http\Controllers\ReviewController::class, 'sellerReviews']);
     Route::get('/reviews/{product}', [App\Http\Controllers\ReviewController::class, 'reviews']);
     Route::post('/review', [App\Http\Controllers\ReviewController::class, 'store']);
     Route::delete('/review/{review}', [App\Http\Controllers\ReviewController::class, 'destroy']);
@@ -95,32 +94,38 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/roles', [App\Http\Controllers\RoleController::class, 'index']);
 
     //comments
-    Route::resource('comments', App\Http\Controllers\CommentController::class)->except(['index']);
-});
+    Route::get('/comments/seller', [App\Http\Controllers\CommentController::class, 'sellerComments']);
+    Route::post('/comments/{comment}/reply', [App\Http\Controllers\CommentController::class, 'reply']);
+    Route::resource('comments', App\Http\Controllers\CommentController::class);
+    Route::get('/comments/verify/{comment}', [App\Http\Controllers\CommentController::class, 'verify']);
 
+    Route::get('/dashboard/admin/data', [App\Http\Controllers\DashboardController::class, 'adminData']);
+    Route::get('/dashboard/seller/data', [App\Http\Controllers\DashboardController::class, 'sellerData']);
+    Route::get('/dashboard/customer/data', [App\Http\Controllers\DashboardController::class, 'customerData']);
+});
 
 // Product Management Routes
 Route::get('/product', [App\Http\Controllers\ProductController::class, 'index']);
+Route::get('/product/top-selling', [App\Http\Controllers\ProductController::class, 'topSelling']);
 Route::get('product/{product}', [App\Http\Controllers\ProductController::class, 'show']);
+Route::get('product/similar/{product}', [App\Http\Controllers\ProductController::class, 'similar']);
 
 Route::get('category', [App\Http\Controllers\CategoryController::class, 'index']);
 Route::post('category/product', [App\Http\Controllers\CategoryController::class, 'product']);
 Route::get('category/product/{category}', [App\Http\Controllers\CategoryController::class, 'categoryProduct']);
 
 //comments
-Route::get('comments/{productId}', [App\Http\Controllers\CommentController::class, 'index']);
+Route::get('comments/product/{productId}', [App\Http\Controllers\CommentController::class, 'productComments']);
 
 //Search
 Route::post('/search', [App\Http\Controllers\SearchController::class, 'filter']);
 Route::get('ad/active-ad', [App\Http\Controllers\AdController::class, 'activeAd']);
 
-Route::get('/test', function () {
-    $role = Role::create(['name' => 'admin']);
-    $permission = Permission::create(['name' => 'access admin dashboard']);
 
-    $role->givePermissionTo($permission);
+//Route::get('/test', [App\Http\Controllers\ProductController::class, 'topSelling']);
+Route::get('/test', function (Request $request) {
+    return \App\Models\Product::where('productName' , 'like', '%p%r%o%d%u%c%t%n%a%m%e%')->get();
 });
-
 
 Route::post('/forgot-password', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendEmail']);
 Route::post('/reset-password', [App\Http\Controllers\Auth\ResetPasswordController::class, 'resetPassword']);

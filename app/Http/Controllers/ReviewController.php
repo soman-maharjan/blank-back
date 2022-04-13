@@ -88,4 +88,14 @@ class ReviewController extends Controller
             $rev->suborder;
         });
     }
+
+    public function sellerReviews(){
+        $reviews = [];
+        foreach(auth()->user()->products as $product){
+            $reviews[] = $product->reviews;
+        }
+
+        return collect($reviews)->flatten(1);
+        return Review::all();
+    }
 }

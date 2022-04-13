@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -74,6 +75,27 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
+//        $request->validate([
+//            'name' => 'required',
+//            'bio' => 'nullable',
+//            'email' => 'required|email|unique:users'
+//        ]);
+
+        $u = User::where('_id', $request->_id)->first();
+        $validator = \Validator::make($request->all(), [
+            'name' => ['required'],
+            'bio' => ['nullable'],
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('users')->ignore($u),
+            ],
+        ]);
+
+        if ($validator->fails()) {
+            return response($validator->errors(), 422);
+        }
+
         $user->name = $request->name;
         $user->bio = $request->bio;
         $user->email = $request->email;

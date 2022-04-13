@@ -9,33 +9,35 @@ class CommentController extends Controller
 {
     public function index()
     {
-        //
+        return Comment::all();
     }
 
-    public function create()
+    public function productComments($productId)
     {
-        //
+        return Comment::where('product_id', $productId)->where('is_verified', true)->get();
     }
 
     public function store(Request $request)
     {
         request()->validate([
             'comment' => 'required',
-            'productId' => 'required'
+            'product_id' => 'required'
         ]);
 
         Comment::create([
             'user_id' => auth()->user()->id,
             'comment' => $request->comment,
-            'productId' => $request->productId
+            'product_id' => $request->product_id,
+            'is_verified' => false,
+            'reply' => null
         ]);
 
         return response('Comment Posted!', 204);
     }
 
-    public function show($id)
+    public function show(Comment $comment)
     {
-        //
+        return $comment;
     }
 
     public function edit($id)
@@ -48,8 +50,38 @@ class CommentController extends Controller
         //
     }
 
-    public function destroy($id)
+    public function destroy(Comment $comment)
     {
-        //
+        $comment->delete();
+        return response('Comment Deleted!', 204);
+    }
+
+    public function verify(Comment $comment)
+    {
+        $comment->is_verified = !$comment->is_verified;
+        $comment->save();
+        return $comment;
+    }
+
+    public function sellerComments()
+    {
+        $comments = [];
+        $products = auth()->user()->products;
+        foreach ($products as $product) {
+            $comments[] = $product->comments;
+        };
+        return collect($comments)->flatten(1)->toArray();
+    }
+
+    public function reply(Comment $comment, Request $request)
+    {
+        $request->validate([
+            'reply' => 'required'
+        ]);
+
+        $comment->reply = $request->reply;
+        $comment->save();
+
+        return $comment;
     }
 }
