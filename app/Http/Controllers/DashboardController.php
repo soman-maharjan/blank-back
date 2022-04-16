@@ -21,7 +21,7 @@ class DashboardController extends Controller
             'created_at', '>=', Carbon::now()->subMonth()
         )->count();
 
-        $userLastMonthCount = Product::where(
+        $userLastMonthCount = User::where(
             'created_at', '>=', Carbon::now()->subMonth()
         )->count();
 

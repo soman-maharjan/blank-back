@@ -110,7 +110,7 @@ class CategoryController extends Controller
 
     public function product(Request $request)
     {
-//        return $request;
+        //        return $request;
         $product = new Product();
 
         $arr = Category::where('parent', $request->value)->pluck('title');
@@ -119,24 +119,38 @@ class CategoryController extends Controller
         return $product->whereIn('category', $arr)
             ->when($request->min != null, function ($q) {
                 return $q->whereRaw([
-                    "sku.price" => ['$gt' => (double) request('min')]
+                    "sku.price" => ['$gt' => (float) request('min')]
                 ]);
             })
             ->when($request->max != null, function ($q) {
                 return $q->whereRaw([
-                    "sku.price" => ['$lt' => (double)request('max')]
+                    "sku.price" => ['$lt' => (float)request('max')]
                 ]);
             })
             ->when($request->rating != "0", function ($q) {
                 return $q->whereRaw([
                     "rating" => ['$gte' => (int) request('rating')]
                 ]);
+            })->when($request->sort != "relevance", function ($q) use ($request) {
+                if ($request->sort == 'zToA') {
+                    return $q->orderBy('productName', 'DESC');
+                } else if ($request->sort == 'new') {
+                    return $q->orderBy('created_at', 'DESC');
+                } else if ($request->sort == 'aToZ') {
+                    return $q->orderBy('productName', 'ASC');
+                } else if ($request->sort == 'highToLow') {
+                    return $q->orderBy('sku.price', 'DESC');
+                } else if ($request->sort == 'lowToHigh') {
+                    return $q->orderBy('sku.price', 'ASC');
+                }
             })->paginate(20);
     }
 
-    public function categoryProduct($category){
+    public function categoryProduct($category)
+    {
         $arr = Category::where('parent', $category)->pluck('title');
         $arr[] = $category;
-        return Product::whereIn('category', $arr)->take(15)->get();
+        return Product::whereIn('category', $arr)->where('is_verified', true)->take(15)->get();
+        // return Product::whereIn('category', $arr)->take(15)->get();
     }
 }

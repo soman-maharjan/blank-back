@@ -12,12 +12,12 @@ class ProductController extends Controller
 {
     public function index()
     {
-        return Product::where('is_active', true)->get();
+        return Product::where('is_active', true)->where('is_verified', true)->get();
     }
 
     public function allProducts()
     {
-        return Product::all();
+        return Product::orderBy('created_at', 'DESC')->get();
     }
 
     public function create()
@@ -189,7 +189,7 @@ class ProductController extends Controller
             ]);
         })->take(15);
 
-
+        $products = [];
         foreach ($ids as $id) {
             $p = Product::where('_id', $id->_id)
                 ->where('is_active', true)

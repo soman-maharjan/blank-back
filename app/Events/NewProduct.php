@@ -32,7 +32,8 @@ class NewProduct implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        $followers = auth()->user()->followers->followers;
+        $user = $this->product->user;
+        $followers = $user->followers->followers;
         $arr = [];
         if ($followers != []) {
             foreach ($followers as $follower) {
