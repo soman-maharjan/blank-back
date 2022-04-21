@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\EmailUpdated;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
@@ -71,7 +73,7 @@ class UserController extends Controller
      *
      * @param \Illuminate\Http\Request $request
      * @param int $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(Request $request, User $user)
     {
@@ -98,6 +100,7 @@ class UserController extends Controller
 
         $user->name = $request->name;
         $user->bio = $request->bio;
+        $oldEmail = $user->email;
         $user->email = $request->email;
 //        return $request;
         foreach ($request->roles as $roles) {
@@ -111,6 +114,15 @@ class UserController extends Controller
             unset($user['role_ids']);
             $user->role = $user->roles->pluck('name');
             unset($user['roles']);
+            if ($oldEmail != $request->email) {
+                $data = [
+                    'title' => 'Email Updated',
+                    'email' => $request->email
+                ];
+
+                Mail::to($user->email)->send(new EmailUpdated($data));
+            }
+
             return response()->json(['message' => 'Updated!', 'data' => $user], 200);
         }
     }

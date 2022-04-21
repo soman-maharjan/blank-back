@@ -136,6 +136,10 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
+        if(SubOrder::where('product_id', $product->id)->where('status', '!=', 'delivered')->first() != null){
+            return response()->json(['message' => 'Product has orders. Cannot be deleted at the moment.'], 422);
+        }
+
         $images = [];
         foreach ($product->sku as $sku) {
             $images = array_merge($images, $sku['images']);
