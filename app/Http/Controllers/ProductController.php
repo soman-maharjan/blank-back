@@ -28,12 +28,13 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
-
+        //change the price and quantity of the request date from string to double and integer
         foreach ($data['sku'] as $key => $sku) {
-            $data['sku'][$key]['price'] = (double)$data['sku'][$key]['price'];
+            $data['sku'][$key]['price'] = (float)$data['sku'][$key]['price'];
             $data['sku'][$key]['quantity'] = (int)$data['sku'][$key]['quantity'];
         }
 
+        //validating the data
         $validator = Validator::make($data, [
             'productName' => 'required|max:255',
             'description' => 'nullable',
@@ -52,7 +53,7 @@ class ProductController extends Controller
         $data['user_id'] = auth()->user()->_id;
         $data['is_active'] = true;
 
-
+        //storing data in products table
         $product = new Product();
         $product->productName = $data['productName'];
         $product->description = $data['description'];
@@ -68,6 +69,7 @@ class ProductController extends Controller
         $product->is_verified = false;
         $product->save();
 
+        // storing the file from the sku array
         foreach ($data['sku'] as $sku) {
             if ($request->hasFile($sku['sellerSku'])) {
                 foreach ($request->file($sku['sellerSku']) as $file) {
@@ -81,12 +83,11 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-//        return $product;
-//        return $product = $product->load(['user' => function($query){
-////            $query->unset('email');
-//        }]);
+        // get user using the product
         $p = $product->load(['user']);
+        //username of the user whose product was in route model binding
         $username = $p->user->name;
+        //remove the user object and attach username only
         $p->unset('user');
         $p['username'] = $username;
         return $p;
@@ -136,15 +137,19 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
-        if(SubOrder::where('product_id', $product->id)->where('status', '!=', 'delivered')->first() != null){
+        //check if the product has orders and if the status of the order is not delivered
+        if (SubOrder::where('product_id', $product->id)->where('status', '!=', 'delivered')->first() != null) {
+            // if it has order then send an error response
             return response()->json(['message' => 'Product has orders. Cannot be deleted at the moment.'], 422);
         }
 
         $images = [];
         foreach ($product->sku as $sku) {
+            // creating an array of images to delete it
             $images = array_merge($images, $sku['images']);
         }
 
+        // delete each image if it exists in the system
         foreach ($images as $img) {
             if (\File::exists(storage_path('app/public/images/' . $img))) {
                 \File::delete(storage_path('app/public/images/' . $img));
@@ -158,6 +163,7 @@ class ProductController extends Controller
     public function userProduct()
     {
         $product = new Product();
+        //get users product
         return $product->userProducts();
     }
 
@@ -174,6 +180,7 @@ class ProductController extends Controller
         $product->is_verified = !$product->is_verified;
         $product->save();
         if ($product->is_verified && $product->is_active) {
+            // after the product has been verified by the admin, broadcast using pusher to the seller's follower
             broadcast(new NewProduct($product));
         }
         return $product;
@@ -181,6 +188,7 @@ class ProductController extends Controller
 
     public function topSelling()
     {
+        // get ids of products that have highest number of orders
         $ids = SubOrder::raw(function ($collection) {
             return $collection->aggregate([
                 ['$group' => [
@@ -194,26 +202,18 @@ class ProductController extends Controller
         })->take(15);
 
         $products = [];
+        //taking products using the ids from the previous query
         foreach ($ids as $id) {
             $p = Product::where('_id', $id->_id)
                 ->where('is_active', true)
                 ->where('is_verified', true)
                 ->first();
-            if($p != null){
+            if ($p != null) {
                 $products[] = $p;
             }
         }
 
         return $products;
-
-//        return \DB::table('suborders')
-//            ->selectRaw('productName')
-//            ->selectRaw('count(suborders)')
-//            ->groupBy('product_id')
-//            ->get();
-//        return SubOrder::all()
-//            ->groupBy('product_id')
-//            ->take(15);
     }
 
     public function similar(Product $product)
@@ -228,6 +228,7 @@ class ProductController extends Controller
         $min = min($prices);
         $max = max($prices);
 
+        // select product that have similar attributes to the one in request.
         return Product::where('productName', 'like', '%' . implode('%', str_split($product->productName)) . '%')
             ->orWhere('category', 'like', $product->category)
             ->orWhere('color', 'like', $product->color)

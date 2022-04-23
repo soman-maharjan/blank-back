@@ -20,6 +20,7 @@ class ReviewController extends Controller
         ]);
 
         $var = [];
+        //storing images in the system if it is uploaded by user
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
                 $var[] = $image->getClientOriginalName();
@@ -43,9 +44,6 @@ class ReviewController extends Controller
 
     public function unreviewed()
     {
-        // $ord = SubOrder::where('_id','617cd747b52f0000000053d5')->first();
-        // return $ord->review;
-
         $ord = [];
         $unreviewed = [];
         foreach (auth()->user()->orders as $order) {
@@ -56,10 +54,6 @@ class ReviewController extends Controller
             if (!Review::where('suborder_id', $o['_id'])->exists()) {
                 array_push($unreviewed, $o);
             }
-            // return Review::where('subOrder_id', $o['_id'])->first();
-            // if (((new SubOrder((array) $o))->review == "")) {
-            //     array_push($unreviewed, $o);
-            // }
         }
 
         return $unreviewed;
@@ -67,6 +61,7 @@ class ReviewController extends Controller
 
     public function destroy(Review $review)
     {
+        // deleting all the images from the system if it exists
         foreach ($review->images as $img) {
             if (\File::exists(storage_path('app/public/images/' . $img))) {
                 \File::delete(storage_path('app/public/images/' . $img));
@@ -76,13 +71,9 @@ class ReviewController extends Controller
         return response(['message' => 'Review Deleted!'], 201);
     }
 
-    /**
-     * @param Product $product
-     * @return mixed
-     * returns reviews of product with user and suborder
-     */
     public function reviews(Product $product)
     {
+        //get product reviews with user and suborder they belong to
         return $product->reviews->each(function ($rev) {
             $rev->user;
             $rev->suborder;

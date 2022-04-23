@@ -19,8 +19,9 @@ class PaymentController extends Controller
     {
         $order = new Order();
 
+        // check the payment gateway
         if ($request->type == 'KHALTI') {
-
+            //create an array of payment data
             $data = [
                 'user_id' => auth()->user()->id,
                 'mobile' => $request->mobile,
@@ -35,30 +36,37 @@ class PaymentController extends Controller
             ];
 
             try {
-
+                //create the date in payments table
                 $payment = $this->payment->create($data);
-
+                //ids of product in the order
                 $serverProductIdentity = explode(",", $request->product_identity);
 
                 $cartProductIdentity = (array)null;
+                //ids of product in the cart in the frontend
                 foreach ($request->cart['products'] as $product) {
                     $cartProductIdentity[] = $product['_id'];
                 }
 
+                //get the grant total of the products in the cart
                 $cartTotal = $order->getGrandTotal($request->cart);
 
+                //check if the ids in the server is same as the ids in the cart and if the total matches
                 if (($serverProductIdentity == $cartProductIdentity) && ($cartTotal == $request->amount)) {
+                    //verifying the payment through the payment gateway server
                     if ($this->verifyKhaltiPayment($cartTotal, $request->token, $payment)) {
+                        // after verification, store the order in the orders table
                         $data = $order->storeOrder($request->cart, $request->address);
                         $data['type'] = $payment['type'];
                         $data['name'] = $payment['name'];
-
+                        //updete order id in the payments table.
                         $payment->update(['order_id' => $data['orderId']]);
 
                         return response()->json($data, 200);
                     }
                 }
-            } catch (Exception $e) {
+            } 
+            //return errors
+            catch (Exception $e) {
                 return response()->json(['error' => 'Something went Wrong , Try Again !!'], 422);
             }
             return response()->json(['error' => 'Something went Wrong , Try Again !!'], 422);
@@ -67,6 +75,7 @@ class PaymentController extends Controller
 
     public function verifyKhaltiPayment($cartTotal, $token, $payment)
     {
+        // sending validaiton request to khalti server with cart total and token
         $response = Http::withHeaders([
             'Authorization' => 'Key ' . env("KHALTI_SECRET_KEY")
         ])->post('https://khalti.com/api/v2/payment/verify/', [
@@ -74,6 +83,7 @@ class PaymentController extends Controller
             'token' => $token,
         ]);
 
+        // if the payment is verified by payment gateway server, store the token, type and name in the payments table.
         if ($response->successful() && isset($response['idx'])) {
             $payment->update(['status' => 1, 'verified_token' => $response['idx'], 'type' => $response['type']['name'], 'name' => $response['user']['name']]);
             return true;

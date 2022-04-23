@@ -30,16 +30,26 @@ class SearchController extends Controller
                     "rating" => ['$gte' => (int)request('rating')]
                 ]);
             })
+            //if the sort value is not relevance
             ->when($request->sort != "relevance", function ($q) use ($request) {
+                //order the product by descending order
                 if ($request->sort == 'zToA') {
                     return $q->orderBy('productName', 'DESC');
-                } else if ($request->sort == 'new') {
+                }
+                //order the products by descending order of created_at attribute
+                else if ($request->sort == 'new') {
                     return $q->orderBy('created_at', 'DESC');
-                } else if ($request->sort == 'aToZ') {
+                }
+                // order the products by ascending order of product name
+                else if ($request->sort == 'aToZ') {
                     return $q->orderBy('productName', 'ASC');
-                } else if ($request->sort == 'highToLow'){
+                }
+                // order by price (hightest price first)
+                else if ($request->sort == 'highToLow') {
                     return $q->orderBy('sku.price', 'DESC');
-                } else if ($request->sort == 'lowToHigh'){
+                }
+                //order by price (lowest price first)
+                else if ($request->sort == 'lowToHigh') {
                     return $q->orderBy('sku.price', 'ASC');
                 }
             })

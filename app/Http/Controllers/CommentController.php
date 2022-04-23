@@ -14,16 +14,19 @@ class CommentController extends Controller
 
     public function productComments($productId)
     {
+        // select comments where product id matches productId and is verified by the admin
         return Comment::where('product_id', $productId)->where('is_verified', true)->get();
     }
 
     public function store(Request $request)
     {
+        //validate comment
         request()->validate([
             'comment' => 'required',
             'product_id' => 'required'
         ]);
 
+        //create a new comment record 
         Comment::create([
             'user_id' => auth()->user()->id,
             'comment' => $request->comment,
@@ -66,19 +69,24 @@ class CommentController extends Controller
     public function sellerComments()
     {
         $comments = [];
+        //get user's products
         $products = auth()->user()->products;
+        //for each products of the user, get the comments
         foreach ($products as $product) {
             $comments[] = $product->comments;
         };
+        // flatten the array of array to the depth of 1 and convert to array
         return collect($comments)->flatten(1)->toArray();
     }
 
     public function reply(Comment $comment, Request $request)
     {
+        // check if the request has reply
         $request->validate([
             'reply' => 'required'
         ]);
-
+        
+        //update the reply field 
         $comment->reply = $request->reply;
         $comment->save();
 
