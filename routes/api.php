@@ -78,7 +78,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     //reviews
     Route::get('/review', [App\Http\Controllers\ReviewController::class, 'index']);
     Route::get('/reviews/seller', [App\Http\Controllers\ReviewController::class, 'sellerReviews']);
-    Route::get('/reviews/{product}', [App\Http\Controllers\ReviewController::class, 'reviews']);
     Route::post('/review', [App\Http\Controllers\ReviewController::class, 'store']);
     Route::delete('/review/{review}', [App\Http\Controllers\ReviewController::class, 'destroy']);
     Route::get('/unreviewed', [App\Http\Controllers\ReviewController::class, 'unreviewed']);
@@ -103,6 +102,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/dashboard/seller/data', [App\Http\Controllers\DashboardController::class, 'sellerData']);
     Route::get('/dashboard/customer/data', [App\Http\Controllers\DashboardController::class, 'customerData']);
 });
+
+Route::get('/reviews/{product}', [App\Http\Controllers\ReviewController::class, 'reviews']);
 
 // Product Management Routes
 Route::get('/product', [App\Http\Controllers\ProductController::class, 'index']);
